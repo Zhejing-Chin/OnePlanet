@@ -26,7 +26,7 @@ subjects = next(os.walk(path))[1]
 
 # ./WESAD/S2/S2_readme.txt
 personal_information = get_personal_information(path, subjects)
-# print(personal_information.shape)
+print(personal_information.shape)
 
 # ./WESAD/S2/S2_respiban.txt = chest
 # respiban = get_respiban(path, subjects[1:2])
