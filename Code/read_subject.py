@@ -1,6 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn import preprocessing
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def read_readme_txt(dataFolder, subject):
     path = f"{dataFolder}/{subject}/{subject}_readme.txt"
@@ -75,6 +80,9 @@ def get_personal_information(dataFolder, subjects):
     personal_information = personal_information.set_index('id')    
     
     # EDA
+    percent_missing = personal_information.isnull().sum() * 100 / len(personal_information)
+    print(percent_missing)
+     
     fig, axes = plt.subplots(nrows=3, ncols=4, figsize=(12, 6))
     sns.countplot(data=personal_information, x="gender", ax=axes[0,0])
     personal_information.groupby('gender').age.plot(kind='kde', legend=True, ax=axes[0,1])
@@ -92,4 +100,19 @@ def get_personal_information(dataFolder, subjects):
     plt.savefig('./EDA/personal_information.png')
     # plt.show()
     
+    personal_information.to_csv('./Data/personal_information.csv')
+
+    
     return personal_information
+
+# Preprocess the "additional notes" column
+def preprocess_text(text):
+    # Tokenize the text
+    tokens = nltk.word_tokenize(text.lower())
+    
+    # Remove stopwords and apply lemmatization
+    lemmatized_tokens = [lemmatizer.lemmatize(token) for token in tokens if token not in stop_words]
+    
+    # Join the lemmatized tokens back into a sentence
+    cleaned_text = ' '.join(lemmatized_tokens)
+    return cleaned_text
