@@ -28,6 +28,15 @@ subjects = next(os.walk(path))[1]
 personal_information = get_personal_information(path, subjects)
 print(personal_information.shape)
 
+# # Full synchronised sensor data with ground truth
+# sensor_data = full_data_groundtruth(path, subjects)
+# # print(sensor_data.shape)
+
+# # The team able to analyse the full dataframe / with selected columns
+# # combine personal information with sensor data
+# full_data = personal_information.join(sensor_data, how='right', on="id")
+# print(full_data.shape, full_data.columns)
+
 # ./WESAD/S2/S2_respiban.txt = chest
 # respiban = get_respiban(path, subjects[1:2])
 # print(respiban)
@@ -42,11 +51,3 @@ print(personal_information.shape)
 # ground_truth = read_quest_csv(path, subjects[1])
 # print()
 
-# # Full synchronised sensor data with ground truth
-# sensor_data = full_data_groundtruth(path, subjects)
-# # print(sensor_data.shape)
-
-# # The team able to analyse the full dataframe / with selected columns
-# # combine personal information with sensor data
-# full_data = personal_information.join(sensor_data, how='right', on="id")
-# print(full_data.shape, full_data.columns)
