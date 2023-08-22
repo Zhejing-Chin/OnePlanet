@@ -130,8 +130,6 @@ def encode_embed(data):
             data[col]= label_encoder.fit_transform(data[col])
 
     return data
-
-
     
 # Preprocess the "additional notes" column
 def preprocess_text(text):
