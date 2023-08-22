@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from read_subject import get_personal_information
-from read_sensor import read_quest_csv, full_data_groundtruth
+from read_sensor import full_data_groundtruth
 
 """ 
 Problems definition: 
@@ -25,11 +25,14 @@ path = "./WESAD"
 subjects = next(os.walk(path))[1]
 
 # ./WESAD/S2/S2_readme.txt
-personal_information = get_personal_information(path, subjects)
-print(personal_information.shape)
+# personal_information = get_personal_information(path, subjects)
+# print(personal_information.shape)
 
 # # Full synchronised sensor data with ground truth
-# sensor_data = full_data_groundtruth(path, subjects)
+sensor_data = full_data_groundtruth(path, subjects)
+# chest_acc = sensor_data[['chest_acc_x', 'chest_acc_y', 'chest_acc_z']].values.tolist()
+# wrist_acc = sensor_data[['wrist_acc_x', 'wrist_acc_y', 'wrist_acc_z']].values.tolist()
+# 
 # # print(sensor_data.shape)
 
 # # The team able to analyse the full dataframe / with selected columns

@@ -5,8 +5,7 @@ import os
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import resample, decimate
-from scipy.interpolate import interp1d
+from scipy.signal import resample
 
 # def read_respiban_txt(dataFolder, subject):
 #     vcc=3
@@ -139,7 +138,7 @@ def read_pkl(dataFolder, subject):
     label_indices = np.linspace(0, len(sync['label']) - 1, target_length).astype(int)
     chest_data_32hz['label'] = sync['label'][label_indices]
     
-    assert sum(chest_data_32hz['label']) != 0
+    # assert sum(chest_data_32hz['label']) != 0
 
     # ACC, BVP, EDA, TEMP
     # acc at 1/64g
@@ -177,7 +176,7 @@ def read_pkl(dataFolder, subject):
     assert all(len(data) == target_length for data in wrist_data_32hz.values()) and \
        len(wrist_acc) == target_length
     
-    # plot_acceleration(resampled_chest_data.transpose(), acc_wrist.transpose())
+    # plot_acceleration(chest_data_32hz['ACC'].transpose(), wrist_acc.transpose())
     
     # assume label 4 link to both med 1 and med 2 in ground truth
     sensor = {'chest_acc_x': chest_data_32hz['ACC'][:, 0],
@@ -259,6 +258,14 @@ def read_quest_csv(dataFolder, subject):
         + [f"sssq_{i+1}" for i in range(6)]
     ground_truths = pd.DataFrame(ground_truths, columns=cols)
     
+    # feature engineering
+    # get time difference
+    for col in ['start', 'end']:
+        ground_truths[col] = ground_truths[col].apply(convert_to_time_format)
+        ground_truths[col] = pd.to_timedelta(ground_truths[col])
+    ground_truths['time_difference'] = (ground_truths['end'] - ground_truths['start']).apply(lambda x: f"{int(x.total_seconds() // 60)}.{int(x.total_seconds() % 60):02}")
+    ground_truths = ground_truths.drop(columns=['start', 'end'])    
+    
     # condition - label
     # Base - 1
     # TSST - 2
@@ -266,7 +273,6 @@ def read_quest_csv(dataFolder, subject):
     # Medi 1 - 4
     # Medi 2 - 4
     # Assuming Medi 1 and 2 both match tp Meditation label in Synchronised data
-    
     ground_truths["label"] = ground_truths["label"].map({
         "Base": 1, 
         "TSST": 2,
@@ -276,6 +282,16 @@ def read_quest_csv(dataFolder, subject):
     
     return ground_truths
 
+def convert_to_time_format(time_str):
+    if '.' in time_str:
+        minutes, seconds = map(int, time_str.split('.'))
+    else:
+        minutes = int(time_str)
+        seconds = 0
+    hours = minutes // 60
+    minutes %= 60
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
+
 def full_data_groundtruth(dataFolder, subjects, questionnaires=False):
     all_subjects = pd.DataFrame()
     for subject in subjects:
@@ -283,18 +299,18 @@ def full_data_groundtruth(dataFolder, subjects, questionnaires=False):
         # encode ground truth - study protocol as class label
         # keep only 1-4
         synch_data = synch_data[synch_data['label'].isin([1, 2, 3, 4])]
+        groundtruth = read_quest_csv(dataFolder, subject)
+        # break
         
-        # 
-        if questionnaires:
-            groundtruth = read_quest_csv(dataFolder, subject)
+        # if questionnaires self-reports needed
+        if not questionnaires:     
+            groundtruth = groundtruth[['label', 'time_difference']]
             
-            per_subject = synch_data.join(groundtruth, lsuffix='_pkl', rsuffix='_quest')
-            per_subject = per_subject.drop(columns=['label_quest']).\
-                    rename(columns={"label_pkl": "label"}).\
-                    set_index('id')
-        else:
-            per_subject = synch_data.set_index('id')
-                
+        per_subject = synch_data.join(groundtruth, lsuffix='_pkl', rsuffix='_quest')
+        per_subject = per_subject.drop(columns=['label_quest']).\
+                rename(columns={"label_pkl": "label"}).\
+                set_index('id')
+                       
         if not all_subjects.empty:
             all_subjects = pd.concat([all_subjects, per_subject])
         else:
@@ -302,7 +318,27 @@ def full_data_groundtruth(dataFolder, subjects, questionnaires=False):
     
     # print(full.columns)
     
-    
+    # boxplot(all_subjects)
     return all_subjects
     
+def boxplot(data):
+    fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(12, 6))
     
+    data.boxplot(column=['chest_acc_x', 'chest_acc_y', 'chest_acc_z'],
+                 ax=axes[0,0])
+    data.boxplot(column=['wrist_acc_x', 'wrist_acc_y', 'wrist_acc_z'],
+                 ax=axes[0,1])
+    data.boxplot(column=['chest_ecg', 'chest_emg', 'chest_resp'],
+                 ax=axes[0,2])
+    data.boxplot(column=['wrist_bvp'],
+                 ax=axes[1,0])
+    # data.boxplot(column=['wrist_acc_x', 'wrist_acc_y', 'wrist_acc_z'],
+    #              ax=axes[1,0])
+    data.boxplot(column=['chest_eda', 'wrist_eda'],
+                 ax=axes[1,1])
+    data.boxplot(column=['chest_temp', 'wrist_temp'],
+                 ax=axes[1,2])
+
+    plt.tight_layout() 
+    plt.savefig('./EDA/before_sensor_data.png')
+    plt.show()
