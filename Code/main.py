@@ -25,13 +25,10 @@ subjects = next(os.walk(path))[1]
 # respiban = get_respiban(path, subjects[1:2])
 # print(respiban)
 
-# ./WESAD/S2/S2_E4_Data.zip = wrist
-# read_empatica_zip(path, subjects[0])
-
 # ./WESAD/S2/S2.pkl = synchronised chest + wrist
 # print(len(read_pkl(path, subjects[1])['signal']['wrist']['TEMP']))
-sync_c, sync_w = read_pkl(path, subjects[1])
-print(sync_w)
+sensor = read_pkl(path, subjects[13])
+print(sensor)
 # print()
 
 # ./WESAD/S2/S2_quest.csv

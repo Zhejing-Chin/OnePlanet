@@ -90,7 +90,27 @@ from scipy.interpolate import interp1d
 #     unzip_empatica(dataFolder, subject)
     
 #     csv_files = ['ACC', 'BVP', 'EDA', 'TEMP']
-    
+
+def resample_data(data, target_length):
+    return resample(data, target_length, axis=0)
+
+def interpolate_data(time_indices, data, fs):
+    return np.interp(time_indices, np.arange(len(data)) / fs, data)
+
+def align_and_resample_data(sync_data, device, original_length, target_length, data_type=None, fs=None, time_indices=None):
+    if data_type:
+        data = sync_data['signal'][device][data_type].astype(float)
+    else:
+        data = sync_data['label']
+        
+    if data_type != 'ACC':
+        data = data.reshape(original_length)
+    if fs:
+        aligned_data = interpolate_data(time_indices, data, fs)
+    else:
+        aligned_data = resample_data(data, target_length)
+    return aligned_data
+
 def read_pkl(dataFolder, subject):
     # pkl file is already synchronized
     # only need to realign data rows by up / downsampling
@@ -99,26 +119,28 @@ def read_pkl(dataFolder, subject):
     sync = pd.read_pickle(path) 
     
     # ACC, ECG, EDA, EMG, Resp, Temp 
-    chest_acc = sync['signal']['chest']['ACC'].astype(float)
+    resampling_factor = 32/700
+    chest_acc = sync['signal']['chest']['ACC']
+    original_length = chest_acc.shape[0]
+    target_length = int(original_length * resampling_factor)
+    # print(original_length, target_length)
+    data_types = ['ACC', 'ECG', 'EDA', 'EMG', 'Resp', 'Temp']
     
-    length = chest_acc.shape[0]
-    chest = {'xyz_1': chest_acc[:, 0],
-             'xyz_2': chest_acc[:, 1],
-             'xyz_3': chest_acc[:, 2],
-             'ecg': sync['signal']['chest']['ECG'].reshape(length).astype(float),
-             'emg': sync['signal']['chest']['EMG'].reshape(length).astype(float),
-             'eda': sync['signal']['chest']['EDA'].reshape(length).astype(float),
-             'resp': sync['signal']['chest']['Resp'].reshape(length).astype(float),
-             'temp': sync['signal']['chest']['Temp'].reshape(length).astype(float),
-             'label': sync['label']}
-    respiban = pd.DataFrame.from_dict(chest)
-    respiban.insert(loc=0, column='id', value=subject)
+    # --------------
+    #  realign chest data to match data points to 32hz
+    # --------------
+    chest_data_32hz = {
+        data_type: align_and_resample_data(sync, 'chest', original_length, target_length, data_type) for data_type in data_types
+    }
+    # Convert label timestamps to the 32Hz time base
+    label_indices = np.linspace(0, len(sync['label']) - 1, target_length).astype(int)
+    chest_data_32hz['label'] = sync['label'][label_indices]
+    assert sum(chest_data_32hz['label']) != 0
 
-    
     # ACC, BVP, EDA, TEMP
     # acc at 1/64g
     wrist_acc = sync['signal']['wrist']['ACC'].astype(float) * (1/64)
-    
+
     # ------------------------------
     # * perform chest and wrist realignement first, as accelerometer data provides the timing information that can be used as a reference for synchronizing multimodal.
     # downsample chest data to match with wrist data
@@ -126,60 +148,53 @@ def read_pkl(dataFolder, subject):
     # risk: losing information
     # solution: upsample wrist data instead as chest data has more points to match with
     # -------------------------------
-    resampling_factor = 32/700
-    num_samples_after_resample = int(len(chest_acc) * resampling_factor)
-    chest_acc_32hz = resample(chest_acc, num_samples_after_resample, axis=0)
-    
-    print(wrist_acc.shape, chest_acc_32hz.shape)
-    
-    #64hz
-    wrist_bvp = sync['signal']['wrist']['BVP'].reshape(sync['signal']['wrist']['BVP'].size).astype(float)
-    #4hz
-    wrist_eda = sync['signal']['wrist']['EDA'].reshape(sync['signal']['wrist']['EDA'].size).astype(float)
-    wrist_temp = sync['signal']['wrist']['TEMP'].reshape(sync['signal']['wrist']['TEMP'].size).astype(float)
-    
+    assert all(len(data) == target_length for data in chest_data_32hz.values()) and \
+       len(wrist_acc) == target_length
+        
+        
     # --------------
     # since chest and wrist aligned, realign the other features to match 32hz to ensure consistency
     # decimate bvp, interpolate eda and temp
     # it might introduces artifacts
     # could try to resample with different sampling rate.
     # ---------------
-    
-    # decimate bvp
-    wrist_bvp_32hz = decimate(wrist_bvp, q=2, ftype='iir')
-    
-    # interpolate eda, temp
     target_sampling_rate = 32  # Hz
-    num_samples = len(wrist_acc)
-    time_indices = np.arange(num_samples) / target_sampling_rate
-    wrist_eda_32hz = np.interp(time_indices, np.arange(len(wrist_eda)) / 4, wrist_eda)
-    wrist_temp_32hz = np.interp(time_indices, np.arange(len(wrist_temp)) / 4, wrist_eda)
-
-    assert wrist_acc.shape[0]==wrist_bvp_32hz.shape[0]\
-         & wrist_acc.shape[0]==wrist_eda_32hz.shape[0]\
-         & wrist_acc.shape[0]==wrist_temp_32hz.shape[0]
+    time_indices = np.arange(target_length) / target_sampling_rate
     
-    # wrist = {'xyz_1': acc[0],
-    #          'xyz_2': acc[1],
-    #          'xyz_3': acc[2],
-    #          'bvp': bvp,
-    #          'eda': eda,
-    #          'temp': temp}
-    # empatica = pd.DataFrame.from_dict(wrist)
-    # empatica.insert(loc=0, column='id', value=subject)
+    length_bvp = len(sync['signal']['wrist']['BVP'])
+    length_eda = len(sync['signal']['wrist']['EDA'])
+    length_temp = len(sync['signal']['wrist']['TEMP'])
     
-    
-    
-    
-    
-
-    # print(resampled_chest_data.shape, acc_wrist.shape)
+    wrist_data_32hz = {
+        'BVP': align_and_resample_data(sync, 'wrist', length_bvp, target_length, 'BVP'),
+        'EDA': align_and_resample_data(sync, 'wrist', length_eda, target_length, 'EDA', 4, time_indices),
+        'Temp': align_and_resample_data(sync, 'wrist', length_temp, target_length, 'TEMP', 4, time_indices),
+    }
+    assert all(len(data) == target_length for data in wrist_data_32hz.values()) and \
+       len(wrist_acc) == target_length
     
     # plot_acceleration(resampled_chest_data.transpose(), acc_wrist.transpose())
     
     # assume label 4 link to both med 1 and med 2 in ground truth
+    sensor = {'chest_acc_x': chest_data_32hz['ACC'][:, 0],
+             'chest_acc_y': chest_data_32hz['ACC'][:, 1],
+             'chest_acc_z': chest_data_32hz['ACC'][:, 2],
+             'chest_ecg': chest_data_32hz['ECG'],
+             'chest_emg': chest_data_32hz['EMG'],
+             'chest_eda': chest_data_32hz['EDA'],
+             'chest_resp': chest_data_32hz['Resp'],
+             'chest_temp': chest_data_32hz['Temp'],
+             'wrist_acc_x': wrist_acc[:, 0],
+             'wrist_acc_y': wrist_acc[:, 1],
+             'wrist_acc_z': wrist_acc[:, 2],
+             'wrist_bvp': wrist_data_32hz['BVP'],
+             'wrist_eda': wrist_data_32hz['EDA'],
+             'wrist_temp': wrist_data_32hz['Temp'],
+             'label': chest_data_32hz['label']}
+    sensor = pd.DataFrame.from_dict(sensor)
+    sensor.insert(loc=0, column='id', value=subject)
     
-    return respiban, None #empatica
+    return sensor
 
 
 def plot_acceleration(acc_chest, acc_wrist):
