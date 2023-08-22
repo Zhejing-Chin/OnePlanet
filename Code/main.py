@@ -1,6 +1,6 @@
 import os
 from read_subject import get_personal_information
-from read_sensor import read_pkl, read_quest_csv
+from read_sensor import full_data_groundtruth
 
 """ 
 Problems definition: 
@@ -27,10 +27,14 @@ subjects = next(os.walk(path))[1]
 
 # ./WESAD/S2/S2.pkl = synchronised chest + wrist
 # print(len(read_pkl(path, subjects[1])['signal']['wrist']['TEMP']))
-sensor = read_pkl(path, subjects[13])
-print(sensor)
+# sensor = read_pkl(path, subjects[13])
+# print(sensor)
 # print()
 
 # ./WESAD/S2/S2_quest.csv
 # ground_truth = read_quest_csv(path, subjects[1])
 # print()
+
+# Full synchronised sensor data with ground truth
+full_sensor_data = full_data_groundtruth(path, subjects[1])
+print(full_sensor_data)

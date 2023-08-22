@@ -132,9 +132,13 @@ def read_pkl(dataFolder, subject):
     chest_data_32hz = {
         data_type: align_and_resample_data(sync, 'chest', original_length, target_length, data_type) for data_type in data_types
     }
+    # unique, counts = np.unique(sync['label'], return_counts=True)
+    # print(dict(zip(unique, counts)))
+    
     # Convert label timestamps to the 32Hz time base
     label_indices = np.linspace(0, len(sync['label']) - 1, target_length).astype(int)
     chest_data_32hz['label'] = sync['label'][label_indices]
+    
     assert sum(chest_data_32hz['label']) != 0
 
     # ACC, BVP, EDA, TEMP
@@ -196,7 +200,6 @@ def read_pkl(dataFolder, subject):
     
     return sensor
 
-
 def plot_acceleration(acc_chest, acc_wrist):
     acceleration = [acc_wrist, acc_chest]
     labels = ['X', 'Y', 'Z']
@@ -214,7 +217,6 @@ def plot_acceleration(acc_chest, acc_wrist):
 
     plt.tight_layout()
     plt.show()
-
 
 def read_quest_csv(dataFolder, subject):
     path = f"{dataFolder}/{subject}/{subject}_quest.csv"
@@ -249,6 +251,45 @@ def read_quest_csv(dataFolder, subject):
                 # print(row[1:7])
                 ground_truths[stress_pos].extend(row[1:7])
     
-    cols = ['condition', 'start', 'end'] + [f"panas_{i+1}" for i in range(panas_len)] + [f"stai_{i+1}" for i in range(6)] + [f"sam_{i+1}" for i in range(2)] + [f"sssq_{i+1}" for i in range(6)]
+    
+    cols = ['label', 'start', 'end'] \
+        + [f"panas_{i+1}" for i in range(panas_len)] \
+        + [f"stai_{i+1}" for i in range(6)] \
+        + [f"sam_{i+1}" for i in range(2)] \
+        + [f"sssq_{i+1}" for i in range(6)]
     ground_truths = pd.DataFrame(ground_truths, columns=cols)
+    
+    # condition - label
+    # Base - 1
+    # TSST - 2
+    # Fun - 3
+    # Medi 1 - 4
+    # Medi 2 - 4
+    # Assuming Medi 1 and 2 both match tp Meditation label in Synchronised data
+    
+    ground_truths["label"] = ground_truths["label"].map({
+        "Base": 1, 
+        "TSST": 2,
+        "Fun": 3,
+        'Medi 1': 4,
+        "Medi 2": 4})
+    
     return ground_truths
+
+def full_data_groundtruth(dataFolder, subject):
+    synch_data = read_pkl(dataFolder, subject)
+    synch_data = synch_data[synch_data['label'].isin([1, 2, 3, 4])]
+    
+    groundtruth = read_quest_csv(dataFolder, subject)
+    
+    full = synch_data.join(groundtruth, lsuffix='_pkl', rsuffix='_quest')
+    full = full.drop(columns=['label_quest']).\
+            rename(columns={"label_pkl": "label"}).\
+            set_index('id')
+    
+    # print(full.columns)
+    
+    
+    return full
+    
+    
