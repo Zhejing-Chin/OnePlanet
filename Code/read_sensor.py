@@ -276,20 +276,33 @@ def read_quest_csv(dataFolder, subject):
     
     return ground_truths
 
-def full_data_groundtruth(dataFolder, subject):
-    synch_data = read_pkl(dataFolder, subject)
-    synch_data = synch_data[synch_data['label'].isin([1, 2, 3, 4])]
-    
-    groundtruth = read_quest_csv(dataFolder, subject)
-    
-    full = synch_data.join(groundtruth, lsuffix='_pkl', rsuffix='_quest')
-    full = full.drop(columns=['label_quest']).\
-            rename(columns={"label_pkl": "label"}).\
-            set_index('id')
+def full_data_groundtruth(dataFolder, subjects, questionnaires=False):
+    all_subjects = pd.DataFrame()
+    for subject in subjects:
+        synch_data = read_pkl(dataFolder, subject)
+        # encode ground truth - study protocol as class label
+        # keep only 1-4
+        synch_data = synch_data[synch_data['label'].isin([1, 2, 3, 4])]
+        
+        # 
+        if questionnaires:
+            groundtruth = read_quest_csv(dataFolder, subject)
+            
+            per_subject = synch_data.join(groundtruth, lsuffix='_pkl', rsuffix='_quest')
+            per_subject = per_subject.drop(columns=['label_quest']).\
+                    rename(columns={"label_pkl": "label"}).\
+                    set_index('id')
+        else:
+            per_subject = synch_data.set_index('id')
+                
+        if not all_subjects.empty:
+            all_subjects = pd.concat([all_subjects, per_subject])
+        else:
+            all_subjects = per_subject
     
     # print(full.columns)
     
     
-    return full
+    return all_subjects
     
     

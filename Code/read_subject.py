@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def read_readme_txt(dataFolder, subject):
     path = f"{dataFolder}/{subject}/{subject}_readme.txt"
@@ -66,9 +68,28 @@ def get_personal_information(dataFolder, subjects):
                                     'additional_notes':''}, index=[])
     
     for subject in subjects:
-        row = read_readme_txt(dataFolder, subject)
+        row = pd.DataFrame([read_readme_txt(dataFolder, subject)])
         
-        personal_information = personal_information.append(row,
-            ignore_index = True)
-        
+        personal_information = pd.concat([personal_information, row], ignore_index = True)
+    
+    personal_information = personal_information.set_index('id')    
+    
+    # EDA
+    fig, axes = plt.subplots(nrows=3, ncols=4, figsize=(12, 6))
+    sns.countplot(data=personal_information, x="gender", ax=axes[0,0])
+    personal_information.groupby('gender').age.plot(kind='kde', legend=True, ax=axes[0,1])
+    personal_information.groupby('gender').height_cm.plot(kind='kde', legend=True, ax=axes[0,2])
+    personal_information.groupby('gender').weight_kg.plot(kind='kde', legend=True, ax=axes[0,3])
+    sns.countplot(data=personal_information, x="gender", hue="dominant_hand", ax=axes[1,0])
+    sns.countplot(data=personal_information, x="gender", hue="coffee_today", ax=axes[1,1])
+    sns.countplot(data=personal_information, x="gender", hue="coffee_last_hr", ax=axes[1,2])
+    sns.countplot(data=personal_information, x="gender", hue="sports_today", ax=axes[1,3])
+    sns.countplot(data=personal_information, x="gender", hue="smoker", ax=axes[2,0])
+    sns.countplot(data=personal_information, x="gender", hue="smoke_last_hr", ax=axes[2,1])
+    sns.countplot(data=personal_information, x="gender", hue="ill_today", ax=axes[2,2])
+    fig.delaxes(axes[2][3])
+    plt.tight_layout()
+    plt.savefig('./EDA/personal_information.png')
+    # plt.show()
+    
     return personal_information
