@@ -439,7 +439,7 @@ def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=Fals
             all_subjects = per_subject
     
     
-    boxplot(all_subjects, "after_FFT_cleaning")
+    # boxplot(all_subjects, "after_FFT_cleaning")
 
     
     # ----------

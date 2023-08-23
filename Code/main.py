@@ -28,17 +28,13 @@ Functions in separate files for easier management and code reusabiltiy.
 path = "./WESAD"
 subjects = next(os.walk(path))[1]
 
-# ./WESAD/S2/S2_readme.txt
-# personal_information = get_personal_information(path, subjects)
+personal_information = get_personal_information(path, subjects)
 
-# # Full synchronised sensor data with ground truth
-sensor_data = full_data_groundtruth(path, subjects, type='both', questionnaires=False)
-try:
-    print(sensor_data.shape)
-except:
-    print(sensor_data)
+# Full synchronised sensor data with ground truth
+sensor_data = full_data_groundtruth(path, subjects, type='wrist', questionnaires=False)
+   
 # # The team able to analyse the full dataframe / with selected columns
 # # combine personal information with sensor data
-# full_data = personal_information.join(sensor_data, how='right', on="id")
+full_data = personal_information.join(sensor_data, how='right', on="id")
 
 
