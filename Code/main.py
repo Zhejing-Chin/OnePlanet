@@ -32,11 +32,13 @@ subjects = next(os.walk(path))[1]
 # personal_information = get_personal_information(path, subjects)
 
 # # Full synchronised sensor data with ground truth
-sensor_data = full_data_groundtruth(path, subjects, questionnaires=False)
-
+sensor_data = full_data_groundtruth(path, subjects, type='both', questionnaires=False)
+try:
+    print(sensor_data.shape)
+except:
+    print(sensor_data)
 # # The team able to analyse the full dataframe / with selected columns
 # # combine personal information with sensor data
 # full_data = personal_information.join(sensor_data, how='right', on="id")
-# full_data.to_csv('./Data/full_data.csv')
 
 
