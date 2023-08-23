@@ -6,6 +6,9 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import resample
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+import seaborn as sns
+
 
 # def read_respiban_txt(dataFolder, subject):
 #     vcc=3
@@ -197,7 +200,29 @@ def read_pkl(dataFolder, subject):
     sensor = pd.DataFrame.from_dict(sensor)
     sensor.insert(loc=0, column='id', value=subject)
     
+    # cleaning
+    # remove rows with chest temp < 0
+    sensor = sensor[sensor['chest_temp']>0]
+    
     return sensor
+
+def zscore_scaling(data):
+    scaler = StandardScaler()
+
+    normalized_df = scaler.fit_transform(data)
+
+    # normalized_df = pd.DataFrame(normalized_df, columns=data.columns)
+    
+    return normalized_df
+
+def minmax_scaling(data):
+    scaler = MinMaxScaler()
+
+    normalized_df = scaler.fit_transform(data)
+
+    # normalized_df = pd.DataFrame(normalized_df, columns=data.columns)
+    
+    return normalized_df
 
 def plot_acceleration(acc_chest, acc_wrist):
     acceleration = [acc_wrist, acc_chest]
@@ -318,10 +343,31 @@ def full_data_groundtruth(dataFolder, subjects, questionnaires=False):
     
     # print(full.columns)
     
-    # boxplot(all_subjects)
+    # boxplot(all_subjects, 'before_sensor_data')
+    
+    # ----------
+    # z-score normalization assumes a normal distribution but range varies
+    # minmax sensitive to outliers, but gives specific range (0-1)
+    # -----------
+    min_max_columns = ['chest_acc_x', 'chest_acc_y', 'chest_acc_z', 
+                        'wrist_acc_x', 'wrist_acc_y', 'wrist_acc_z',
+                        'chest_eda', 'wrist_eda']
+    all_subjects[min_max_columns] = minmax_scaling(all_subjects[min_max_columns])
+
+    standard_columns = ['wrist_bvp', 'chest_resp', 'chest_temp', 'wrist_temp', 'chest_emg', 'chest_ecg']
+    all_subjects[standard_columns] = zscore_scaling(all_subjects[standard_columns])
+       
+    
+    # boxplot(all_subjects, 'normalised_sensor_data')
+    # sns.countplot(data=all_subjects, x="label")
+    # plt.savefig('./EDA/labels_distribution.png')
+    # plt.show()
+    
+    label = all_subjects.pop('label')
+    all_subjects['label'] = label.values.tolist()
     return all_subjects
     
-def boxplot(data):
+def boxplot(data, title):
     fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(12, 6))
     
     data.boxplot(column=['chest_acc_x', 'chest_acc_y', 'chest_acc_z'],
@@ -340,5 +386,7 @@ def boxplot(data):
                  ax=axes[1,2])
 
     plt.tight_layout() 
-    plt.savefig('./EDA/before_sensor_data.png')
+    plt.savefig(f'./EDA/{title}.png')
     plt.show()
+    
+# def 

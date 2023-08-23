@@ -80,15 +80,15 @@ def get_personal_information(dataFolder, subjects):
     
        
     
-    eda(personal_information)
+    # eda(personal_information)
     
-    personal_information.to_csv('./Data/personal_information.csv')
+    # personal_information.to_csv('./Data/personal_information.csv')
     
-    encoded_personal_information = encode_embed(personal_information)
+    # encoded_personal_information = encode_embed(personal_information)
     
-    encoded_personal_information = encoded_personal_information.set_index('id') 
-    encoded_personal_information.to_csv('./Data/encoded_pi.csv')
-    return encoded_personal_information
+    # encoded_personal_information = encoded_personal_information.set_index('id') 
+    # encoded_personal_information.to_csv('./Data/encoded_pi.csv')
+    return personal_information #encoded_personal_information
 
 def eda(data):
     # EDA

@@ -1,3 +1,5 @@
 WESAD/
 Code/__pycache__/
 .DS_Store
+Data/full_data.csv
+Data/full_data_with_questionnaires.csv
