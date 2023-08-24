@@ -1,8 +1,6 @@
 # OnePlanet
 
-## WESAD dataset processing
-
-Link to dataset: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/ 
+## [WESAD] dataset processing
 
 ### Main task: 
 * To prepare the WESAD data for predictive mood model.
@@ -83,4 +81,4 @@ ML cycle:
 7. Prediction
 
 [requirements.txt]: https://github.com/Zhejing-Chin/OnePlanet/blob/vigee/requirements.txt
-
+[WESAD]: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/ 
