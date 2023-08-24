@@ -1,9 +1,9 @@
 # OnePlanet
 
 ## [WESAD] dataset processing
-## *Overview of [Approach]*
+## ➡️ *Overview of [Approach]*
 
-### Main task: 
+### ⭐️ Main task: 
 * To prepare the WESAD data for predictive mood model.
 
 ### Assumptions:
@@ -15,7 +15,7 @@
 3. The goal is to use signals on wearables to predict mood. 
 4. Medi 1 and Medi 2 study protocols both pointing to class: Meditation (4)
 
-### Solution: 
+### [Approach]: 
 1. read_subject.py
     - loop through each subject - SX
     - read SX_readme.txt and create dataframe
@@ -65,7 +65,7 @@
     - get personal information and sensor data from (1. and 2.)
     - join and save dataframe as CSV to desired path. 
 
-### To run on terminal
+### 🖥️ To run on terminal
 > please ensure the python environment is same as [requirements.txt]
 ```sh
 cd {path}
