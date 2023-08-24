@@ -44,8 +44,9 @@ Link to dataset: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/
                 - no realignment needed
             - else 
                 - realign wrist data and labels to wrist BVP (64Hz)
+
         > interpolate signals to match lower hz to higher hz
-        
+
         > resample signals to match higher hz to lower hz
         - cleaning
             - clean data with fourier transform
@@ -61,10 +62,13 @@ Link to dataset: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/
         - feature engineering
             - calculate time span for each condition 
 3. main.py
-    - 
+    - get personal information and sensor data from (1. and 2.)
+    - join and save dataframe as CSV to desired path. 
 
+### To run on terminal
+> make sure the python environment is same as [requirements.txt]
 ```sh
-cd path
+cd {path}
 python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_data.csv 
 ```
 
