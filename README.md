@@ -43,9 +43,9 @@
             - else 
                 - realign wrist data and labels to wrist BVP (64Hz)
 
-        > interpolate signals to match lower hz to higher hz
-
+        > interpolate signals to match lower hz to higher hz\
         > resample signals to match higher hz to lower hz
+        
         - cleaning
             - clean data with fourier transform
             - convert time domain data to frequency domain and clean signals above threshold
@@ -77,14 +77,14 @@ python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_dat
 3. Data visualisation
 > EDA is to help data engineers in detecting outliers and do data cleaning\
 > Some visualisations are for analysts to discover the patterns of the data\
-> Helpful for engineers to work with domain expert to figure out best cleaning methods\
+> Helpful for engineers to work with domain expert to figure out best cleaning methods
 4. Feature Engineering
 > Extracting additional features from original dataset\
-> Should work with domain experts else only adding unnecessary complexity\
+> Should work with domain experts else only adding unnecessary complexity
 5. Model building
 6. Model evaluation
 7. Prediction
-> model deployment\
+> model deployment
 
 * cycle could be repeated to update model with new data
 
