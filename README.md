@@ -1,13 +1,13 @@
 # OnePlanet
 
-WESAD dataset processing
+## WESAD dataset processing
 
 Link to dataset: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/ 
 
-Main task: 
+### Main task: 
 * To prepare the WESAD data for predictive mood model.
 
-Assumptions:
+### Assumptions:
 1. The predictive mood model is 1 level multiclass classification.
 2. The class labels are of study protocol (1-4).
     - higher completion of data (no missing values)
@@ -15,7 +15,7 @@ Assumptions:
     - self reports are subjective and might provide noise, higher complexity and influence to final output.
 3. The goal is to use signals on wearables to predict mood. 
 
-Solution: 
+### Solution: 
 1. read_subject.py
     - loop through each subject - SX
     - read SX_readme.txt and create dataframe

@@ -86,7 +86,7 @@ def get_personal_information(dataFolder, subjects):
     encoded_personal_information = encode_embed(personal_information)
     
     personal_information = encoded_personal_information.set_index('id') 
-
+    # print(personal_information.shape)
     return personal_information
 
 # encode and embed data
@@ -95,7 +95,7 @@ def encode_embed(data):
     tfidf_vectorizer = TfidfVectorizer()
     data['cleaned_notes'] = data['additional_notes'].apply(preprocess_text)
     tfidf_array = tfidf_vectorizer.fit_transform(data['cleaned_notes']).toarray()
-    tfidf_df = pd.DataFrame(tfidf_array, columns=tfidf_vectorizer.get_feature_names_out())
+    tfidf_df = pd.DataFrame(tfidf_array, columns=[f'tfidf_{x}' for x in tfidf_vectorizer.get_feature_names_out()])
     data = pd.concat([data, tfidf_df], axis=1)
     data = data.drop(columns=['cleaned_notes', 'additional_notes'])
     
