@@ -44,8 +44,8 @@ Link to dataset: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/
                 - no realignment needed
             - else 
                 - realign wrist data and labels to wrist BVP (64Hz)
-        - <interpolate signals to match lower hz to higher hz>
-        - <resample signals to match higher hz to lower hz>
+        > interpolate signals to match lower hz to higher hz
+        > resample signals to match higher hz to lower hz
         - cleaning
             - clean data with fourier transform
             - convert time domain data to frequency domain and clean signals above threshold
