@@ -19,9 +19,9 @@
 ### [Approach]: 
 
 #### Summary
-- Data processing 
+- Data Processing 
     - read and tranform data (.txt / .pkl / .csv) to standardized format
-- Data cleaning
+- Data Cleaning
     - realign signals to same sampling rate with resampling / interpolation
     - remove noise with Fourier Transform
     - impute missing values with pandas interpolate - suitable for time series data
