@@ -6,6 +6,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import string
 
 
@@ -78,39 +79,15 @@ def get_personal_information(dataFolder, subjects):
         
         personal_information = pd.concat([personal_information, row], ignore_index = True)
     
-       
+    # cleaning
+    personal_information = normalize(personal_information)  
+            
+    # feature engineering
+    encoded_personal_information = encode_embed(personal_information)
     
-    # eda(personal_information)
-    
-    # personal_information.to_csv('./Data/personal_information.csv')
-    
-    # encoded_personal_information = encode_embed(personal_information)
-    
-    # encoded_personal_information = encoded_personal_information.set_index('id') 
-    # encoded_personal_information.to_csv('./Data/encoded_pi.csv')
-    return personal_information #encoded_personal_information
+    personal_information = encoded_personal_information.set_index('id') 
 
-def eda(data):
-    # EDA
-    # percent_missing = data.isnull().sum() * 100 / len(data)
-    # print(percent_missing)
-     
-    fig, axes = plt.subplots(nrows=3, ncols=4, figsize=(12, 6))
-    sns.countplot(data=data, x="gender", ax=axes[0,0])
-    data.groupby('gender').age.plot(kind='kde', legend=True, ax=axes[0,1])
-    data.groupby('gender').height_cm.plot(kind='kde', legend=True, ax=axes[0,2])
-    data.groupby('gender').weight_kg.plot(kind='kde', legend=True, ax=axes[0,3])
-    sns.countplot(data=data, x="gender", hue="dominant_hand", ax=axes[1,0])
-    sns.countplot(data=data, x="gender", hue="coffee_today", ax=axes[1,1])
-    sns.countplot(data=data, x="gender", hue="coffee_last_hr", ax=axes[1,2])
-    sns.countplot(data=data, x="gender", hue="sports_today", ax=axes[1,3])
-    sns.countplot(data=data, x="gender", hue="smoker", ax=axes[2,0])
-    sns.countplot(data=data, x="gender", hue="smoke_last_hr", ax=axes[2,1])
-    sns.countplot(data=data, x="gender", hue="ill_today", ax=axes[2,2])
-    fig.delaxes(axes[2][3])
-    plt.tight_layout()
-    plt.savefig('./EDA/personal_information.png')
-    # plt.show()
+    return personal_information
 
 # encode and embed data
 def encode_embed(data):
@@ -118,7 +95,7 @@ def encode_embed(data):
     tfidf_vectorizer = TfidfVectorizer()
     data['cleaned_notes'] = data['additional_notes'].apply(preprocess_text)
     tfidf_array = tfidf_vectorizer.fit_transform(data['cleaned_notes']).toarray()
-    tfidf_df = pd.DataFrame(tfidf_array, columns=tfidf_vectorizer.get_feature_names_out())
+    tfidf_df = pd.DataFrame(tfidf_array, columns=[f'tfidf_{x}' for x in tfidf_vectorizer.get_feature_names_out()])
     data = pd.concat([data, tfidf_df], axis=1)
     data = data.drop(columns=['cleaned_notes', 'additional_notes'])
     
@@ -150,4 +127,40 @@ def preprocess_text(text):
     # Join the lemmatized tokens back into a sentence
     cleaned_text = ' '.join(lemmatized_tokens)
     return cleaned_text
+
+# normalize scaling
+def minmax_scaling(data):
+    scaler = MinMaxScaler()
+
+    normalized_df = scaler.fit_transform(data)
+    
+    return normalized_df
+
+def normalize(data):
+    min_max_columns = data.select_dtypes(exclude=['object']).columns
+    data[min_max_columns] = minmax_scaling(data[min_max_columns])
+    
+    return data
+
+def eda(data):
+    # EDA
+    # percent_missing = data.isnull().sum() * 100 / len(data)
+    # print(percent_missing)
+     
+    fig, axes = plt.subplots(nrows=3, ncols=4, figsize=(12, 6))
+    sns.countplot(data=data, x="gender", ax=axes[0,0])
+    data.groupby('gender').age.plot(kind='kde', legend=True, ax=axes[0,1])
+    data.groupby('gender').height_cm.plot(kind='kde', legend=True, ax=axes[0,2])
+    data.groupby('gender').weight_kg.plot(kind='kde', legend=True, ax=axes[0,3])
+    sns.countplot(data=data, x="gender", hue="dominant_hand", ax=axes[1,0])
+    sns.countplot(data=data, x="gender", hue="coffee_today", ax=axes[1,1])
+    sns.countplot(data=data, x="gender", hue="coffee_last_hr", ax=axes[1,2])
+    sns.countplot(data=data, x="gender", hue="sports_today", ax=axes[1,3])
+    sns.countplot(data=data, x="gender", hue="smoker", ax=axes[2,0])
+    sns.countplot(data=data, x="gender", hue="smoke_last_hr", ax=axes[2,1])
+    sns.countplot(data=data, x="gender", hue="ill_today", ax=axes[2,2])
+    fig.delaxes(axes[2][3])
+    plt.tight_layout()
+    plt.savefig('./EDA/personal_information.png')
+    # plt.show()
 
