@@ -1,7 +1,7 @@
 # OnePlanet
 
 ## [WESAD] dataset processing
-## Overview of [Approach]
+## *Overview of [Approach]*
 
 ### Main task: 
 * To prepare the WESAD data for predictive mood model.
