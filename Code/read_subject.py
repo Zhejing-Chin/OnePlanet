@@ -86,7 +86,7 @@ def get_personal_information(dataFolder, subjects):
     encoded_personal_information = encode_embed(personal_information)
     
     personal_information = encoded_personal_information.set_index('id') 
-    # print(personal_information.shape)
+
     return personal_information
 
 # encode and embed data
