@@ -70,15 +70,23 @@ cd {path}
 python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_data.csv 
 ```
 
-
-ML cycle:
+### ML cycle:
 1. Data processing
 2. Data cleaning
+> Completed during data engineering phase
 3. Data visualisation
+> EDA is to help data engineers in detecting outliers and do data cleaning
+> Some visualisations are for analysts to discover the patterns of the data
+> Helpful for engineers to work with domain expert to figure out best cleaning methods
 4. Feature Engineering
-5. Model construction
+> Extracting additional features from original dataset
+> Should work with domain experts else only adding unnecessary complexity
+5. Model building
 6. Model evaluation
 7. Prediction
+> model deployment
+
+* cycle could be repeated to update model with new data
 
 [requirements.txt]: https://github.com/Zhejing-Chin/OnePlanet/blob/vigee/requirements.txt
 [WESAD]: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/ 
