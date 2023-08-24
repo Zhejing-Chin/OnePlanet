@@ -7,13 +7,14 @@
 * To prepare the WESAD data for predictive mood model.
 
 ### Assumptions:
-1. The predictive mood model is 1 level multiclass classification.
-2. The class labels are of study protocol (1-4).
+1. The goal is to use signals on wearables to predict mood. 
+2. The predictive mood model is 1 level multiclass classification.
+3. The class labels are of study protocol (1-4).
     - higher completion of data (no missing values)
     - straightforward to interpret
     - self reports are subjective and might provide noise, higher complexity and influence to final output.
-3. The goal is to use signals on wearables to predict mood. 
-4. Medi 1 and Medi 2 study protocols both pointing to class: Meditation (4)
+4. The classes are imbalanced, but we assume no resampling is needed at this stage as the imbalance could be covered with ML approach. 
+5. Medi 1 and Medi 2 study protocols both pointing to class: Meditation (4)
 
 ### [Approach]: 
 1. read_subject.py
