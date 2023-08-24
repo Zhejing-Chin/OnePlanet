@@ -75,16 +75,16 @@ python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_dat
 2. Data cleaning
 > Completed during data engineering phase
 3. Data visualisation
-> EDA is to help data engineers in detecting outliers and do data cleaning
-> Some visualisations are for analysts to discover the patterns of the data
-> Helpful for engineers to work with domain expert to figure out best cleaning methods
+> EDA is to help data engineers in detecting outliers and do data cleaning\
+> Some visualisations are for analysts to discover the patterns of the data\
+> Helpful for engineers to work with domain expert to figure out best cleaning methods\
 4. Feature Engineering
-> Extracting additional features from original dataset
-> Should work with domain experts else only adding unnecessary complexity
+> Extracting additional features from original dataset\
+> Should work with domain experts else only adding unnecessary complexity\
 5. Model building
 6. Model evaluation
 7. Prediction
-> model deployment
+> model deployment\
 
 * cycle could be repeated to update model with new data
 
