@@ -448,6 +448,8 @@ def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=Fals
 
     # boxplot(all_subjects, 'normalised_sensor_data')
     # sns.countplot(data=all_subjects, x="label")
+    # plt.xticks([0, 1, 2, 3], ['Baseline', 'Stress', 'Amusement', 'Meditation'])
+    # plt.title('Mood label distribution')
     # plt.savefig('./EDA/labels_distribution.png')
     # plt.show()
     

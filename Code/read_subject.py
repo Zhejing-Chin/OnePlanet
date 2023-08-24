@@ -78,7 +78,7 @@ def get_personal_information(dataFolder, subjects):
         row = pd.DataFrame([read_readme_txt(dataFolder, subject)])
         
         personal_information = pd.concat([personal_information, row], ignore_index = True)
-    
+        
     # cleaning
     personal_information = normalize(personal_information)  
             
@@ -150,8 +150,11 @@ def eda(data):
     fig, axes = plt.subplots(nrows=3, ncols=4, figsize=(12, 6))
     sns.countplot(data=data, x="gender", ax=axes[0,0])
     data.groupby('gender').age.plot(kind='kde', legend=True, ax=axes[0,1])
+    axes[0][1].set_xlabel('Age')
     data.groupby('gender').height_cm.plot(kind='kde', legend=True, ax=axes[0,2])
+    axes[0][2].set_xlabel('Height cm')
     data.groupby('gender').weight_kg.plot(kind='kde', legend=True, ax=axes[0,3])
+    axes[0][3].set_xlabel('Weight kg')
     sns.countplot(data=data, x="gender", hue="dominant_hand", ax=axes[1,0])
     sns.countplot(data=data, x="gender", hue="coffee_today", ax=axes[1,1])
     sns.countplot(data=data, x="gender", hue="coffee_last_hr", ax=axes[1,2])
