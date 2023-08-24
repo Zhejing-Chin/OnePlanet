@@ -4,17 +4,30 @@ WESAD dataset processing
 
 Link to dataset: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/ 
 
-Problems definition: 
-1. To create a data processing pipeline for WESAD sensor data. 
-2. The resulting datasets should be in consistent format. (Same column names and types and order)
-3. The end output helps in easier analysing and using for building predictive mood model (classification).
-4. The processed data should be clear and full with details to provide greater space for feature engineering / extraction.
+Main task: 
+* To prepare the WESAD data for predictive mood model.
 
 Assumptions:
-1. The class labels are of study protocol (1-4).
+1. The predictive mood model is 1 level multiclass classification.
+2. The class labels are of study protocol (1-4).
     - higher completion of data (no missing values)
     - straightforward to interpret
     - self reports are subjective and might provide noise, higher complexity and influence to final output.
+3. The goal is to use signals on wearables to predict mood. 
+
+Solution: 
+1. read_subject.py
+    - loop through each subject - SX
+    - read SX_readme.txt and create dataframe
+    - check for missing values
+    - generate EDA for statistical analysis
+    - embed "additional notes" as feature engineering 
+    - encode categorical 
+
+2. The end output helps in easier analysing and using for building predictive mood model (classification).
+4. The processed data should be clear and full with details to provide greater space for feature engineering / extraction.
+
+
 
 ML cycle:
 1. Data processing
