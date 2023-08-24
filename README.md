@@ -66,7 +66,7 @@ Link to dataset: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/
     - join and save dataframe as CSV to desired path. 
 
 ### To run on terminal
-> make sure the python environment is same as [requirements.txt]
+> please ensure the python environment is same as [requirements.txt]
 ```sh
 cd {path}
 python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_data.csv 
@@ -81,4 +81,6 @@ ML cycle:
 5. Model construction
 6. Model evaluation
 7. Prediction
+
+[requirements.txt]: https://github.com/Zhejing-Chin/OnePlanet/blob/vigee/requirements.txt
 
