@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from scipy.signal import resample
-from scipy.fft import rfft, rfftfreq, fftfreq
+from scipy.fft import rfft, rfftfreq
 from scipy.signal import find_peaks
 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -57,10 +57,6 @@ def read_pkl(dataFolder, subject, type='both'):
         label_indices = np.linspace(0, len(sync['label']) - 1, target_length).astype(int)
         chest_data['label'] = sync['label'][label_indices]
             
-        # wrist_acc = sync['signal']['wrist']['ACC']
-        # assert all(len(data) == target_length for data in chest_data.values())
-        
-        
         # --------------
         # since chest and wrist aligned, realign the other features to match 32hz to ensure consistency
         # decimate bvp, interpolate eda and temp
@@ -370,7 +366,7 @@ def add_dominant_frequency(df, target_sampling_rate):
     
     return df
 
-#  EDA / Visualisation
+#  EDA / Visualisation <- only for data engineering process
 def plot_acceleration(acc_chest, acc_wrist):
     acceleration = [acc_wrist, acc_chest]
     labels = ['X', 'Y', 'Z']
