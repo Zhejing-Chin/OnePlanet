@@ -329,12 +329,13 @@ def get_time_difference(data):
     return data
 
 # -- get dominant frequency from FFT --
-# looking at peaks of fft
+# looking at peaks of rfft
 # often associated with repeating patterns or periodic behavior in the original signal.
 def get_dominant_frequency(signal, sampling_rate):
     fft_result = rfft(signal)
     freqs = rfftfreq(len(signal), d=1/sampling_rate)
     peaks, _ = find_peaks(abs(fft_result))
+    # error handling
     if len(peaks) > 0:
         dominant_peak = peaks[np.argmax(fft_result[peaks])]
         dominant_frequency = freqs[dominant_peak]
@@ -366,7 +367,7 @@ def add_dominant_frequency(df, target_sampling_rate):
     
     return df
 
-#  EDA / Visualisation <- only for data engineering process
+#  EDA / Visualisation
 def plot_acceleration(acc_chest, acc_wrist):
     acceleration = [acc_wrist, acc_chest]
     labels = ['X', 'Y', 'Z']
@@ -409,6 +410,7 @@ def boxplot(data, title):
 def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=False):
     all_subjects = pd.DataFrame()
     
+    # error handling
     if type not in ['both', 'chest', 'wrist']: 
         return Exception("Sorry, only term in ['both', 'chest', 'wrist']")
     

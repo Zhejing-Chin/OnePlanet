@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import argparse
+# modular design for code reusability
 from read_subject import get_personal_information
 from read_sensor import full_data_groundtruth
 

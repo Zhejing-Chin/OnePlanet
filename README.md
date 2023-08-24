@@ -45,7 +45,7 @@
 
         > interpolate signals to match lower hz to higher hz\
         > resample signals to match higher hz to lower hz
-        
+
         - cleaning
             - clean data with fourier transform
             - convert time domain data to frequency domain and clean signals above threshold
@@ -59,6 +59,7 @@
             - encode conditions to label
         - feature engineering
             - calculate time span for each condition 
+
 3. main.py
     - get personal information and sensor data from (1. and 2.)
     - join and save dataframe as CSV to desired path. 
@@ -70,10 +71,40 @@ cd {path}
 python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_data.csv 
 ```
 
+### Agile Software development:
+1. Plan and Design:
+    - clearly define and understand the project's requirements before starting development.
+    - sign off could avoid developers reverting back to planning / discussion phase multiple times, leads to delay of delivery
+    - spend time designing the architecture, data flow, and user interface before writing code.
+2. Version control:
+    - make use of Git to track changes and collaborate with others
+    - code reviews with peers before merging to main branch.
+3. Development:
+    - sprint meetings with project leader and the team
+    - keep track of tasks progress of each developer on JIRA
+    - code reusability
+        - modular design (breaking into read_subject and read_sensor.py)
+        - use libraries like scipy, numpy
+4. Testing:
+    - For QA testers: create QA test sheets for each task
+    - For functions that no QA testers involve:
+        - create automated unit test for each component (unit testing)
+        - test interaction between components (integral testing)
+        - run tests continuously after new changes
+5. CI/CD Deployment: 
+    - implement Continuous Integration (CI) and Continuous Deployment (CD) pipelines to automate deployment processes
+6. Error handling:
+    - to handle errors that might be expected and provide meaningful error message
+7. Documentation and knowledge sharing:
+    - to ease handover process
+    - do code reviews to share knowledge
+    - maintain documentation that explains the architecture, design decisions, and usage of your codebase
+    - store all documentations in a unified directory
+
 ### ML cycle:
 1. Data processing
 2. Data cleaning
-> Completed during data engineering phase
+> ^ Completed during data engineering phase
 3. Data visualisation
 > EDA is to help data engineers in detecting outliers and do data cleaning\
 > Some visualisations are for analysts to discover the patterns of the data\
@@ -84,7 +115,7 @@ python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_dat
 5. Model building
 6. Model evaluation
 7. Prediction
-> model deployment
+> Model deployment
 
 * cycle could be repeated to update model with new data
 
