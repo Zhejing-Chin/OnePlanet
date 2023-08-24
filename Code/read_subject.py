@@ -137,7 +137,7 @@ def minmax_scaling(data):
     return normalized_df
 
 def normalize(data):
-    min_max_columns = data.select_dtypes(exclude=['object'])
+    min_max_columns = data.select_dtypes(exclude=['object']).columns
     data[min_max_columns] = minmax_scaling(data[min_max_columns])
     
     return data

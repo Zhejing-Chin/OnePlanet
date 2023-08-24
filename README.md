@@ -22,9 +22,13 @@ Solution:
     - check for missing values
     - generate EDA for statistical analysis
     - embed "additional notes" as feature engineering 
-    - encode categorical 
+    - encode categorical columns (yes:1, no:0, etc)
+    - normalize age, height, weight to ensure no features dominate the model
 
-2. The end output helps in easier analysing and using for building predictive mood model (classification).
+2. read_sensor.py
+    - loop through each subject - SX
+    - 
+     
 4. The processed data should be clear and full with details to provide greater space for feature engineering / extraction.
 
 
