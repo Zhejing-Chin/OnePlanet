@@ -17,6 +17,22 @@
 5. Medi 1 and Medi 2 study protocols both pointing to class: Meditation (4)
 
 ### [Approach]: 
+
+#### Summary
+- Data processing 
+    - read and tranform data (.txt / .pkl / .csv) to standardized format
+- Data cleaning
+    - realign signals to same sampling rate with resampling / interpolation
+    - remove noise with Fourier Transform
+    - impute missing values with pandas interpolate - suitable for time series data
+    - normalize numerical data to appropriate range
+    - encode categorical data
+    - embed texts
+- Feature Engineering
+    - calculate time difference of start and end for each study protocol (mood)
+    - get dominant frequency from each signal group by labels
+
+#### Details
 1. read_subject.py
     - loop through each subject - SX
     - read SX_readme.txt and create dataframe
