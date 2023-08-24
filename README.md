@@ -1,6 +1,7 @@
 # OnePlanet
 
 ## [WESAD] dataset processing
+## Overview of [Approach]
 
 ### Main task: 
 * To prepare the WESAD data for predictive mood model.
@@ -120,4 +121,5 @@ python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_dat
 * cycle could be repeated to update model with new data
 
 [requirements.txt]: https://github.com/Zhejing-Chin/OnePlanet/blob/vigee/requirements.txt
-[WESAD]: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/ 
+[WESAD]: https://ubicomp.eti.uni-siegen.de/home/datasets/icmi18/
+[Approach]: https://docs.google.com/presentation/d/1sdrgBVOkoWKjqnoI1J7KppCdwYtVmJk8REmHo8p-tbQ/edit?usp=sharing
