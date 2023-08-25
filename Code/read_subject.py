@@ -79,6 +79,10 @@ def get_personal_information(dataFolder, subjects):
         
         personal_information = pd.concat([personal_information, row], ignore_index = True)
         
+        # Reduce dimension
+        # the columns have no variations in value hence provide no information to model
+        personal_information = personal_information.drop(columns=['coffee_last_hr', 'smoke_last_hr'])
+        
     # cleaning
     personal_information = normalize(personal_information)  
             
