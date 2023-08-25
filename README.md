@@ -15,6 +15,17 @@
     - self reports are subjective and might provide noise, higher complexity and influence to final output.
 4. The classes are imbalanced, but we assume no resampling is needed at this stage as the imbalance could be covered with ML approach. 
 5. Medi 1 and Medi 2 study protocols both pointing to class: Meditation (4)
+6. Only the synchronized data (.pkl) is relevant as the raw chest or wrist data is not yet synchronized with labels. 
+
+### End Output includes:
+1. Personal information: [id, age, ..., additional notes]
+2. Sensor signals:\
+    i. chest and wrist (32hz)\
+    ii. chest only (700hz)\
+    iii. wrist only (64hz)\
+3. Time duration
+4. Questionnaires (optional)
+5. Label
 
 ### [Approach]: 
 
