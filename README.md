@@ -42,6 +42,7 @@
     - encode categorical data
     - embed texts
 - Feature Engineering
+    - remove columns that have only single value ['coffee_last_hr', 'smoke_last_hr'] to reduce dimension of dataset
     - calculate time difference of start and end for each study protocol (mood)
     - get dominant frequency from each signal group by labels
 
