@@ -166,7 +166,7 @@ def read_quest_csv(dataFolder, subject):
     ground_truths = pd.DataFrame(ground_truths, columns=cols)
     
     # feature engineering
-    ground_truths = get_time_difference(ground_truths)
+    ground_truths = get_duration(ground_truths)
 
     # condition - label
     # Base - 1
@@ -294,10 +294,13 @@ def minmax_scaling(data):
     return normalized_df
 
 def normalize(data, type):
+    # not gaussian distribution
     min_max_columns = ['chest_acc_x', 'chest_acc_y', 'chest_acc_z', 
-                            'wrist_acc_x', 'wrist_acc_y', 'wrist_acc_z',
-                            'chest_eda', 'wrist_eda']
-    standard_columns = ['wrist_bvp', 'chest_resp', 'chest_temp', 'wrist_temp', 'chest_emg', 'chest_ecg']
+                        'wrist_acc_x', 'wrist_acc_y', 'wrist_acc_z',
+                        'chest_eda', 'wrist_eda', 'duration']
+    # expects normally distributed data
+    standard_columns = ['wrist_bvp', 'chest_resp', 'chest_temp', 
+                        'wrist_temp', 'chest_emg', 'chest_ecg']
     if type != 'both':
         min_max_columns = [col for col in min_max_columns if type in col]
         standard_columns = [col for col in standard_columns if type in col]
@@ -319,11 +322,12 @@ def convert_to_time_format(time_str):
     minutes %= 60
     return f"{hours:02}:{minutes:02}:{seconds:02}"
 
-def get_time_difference(data):
+def get_duration(data):
     for col in ['start', 'end']:
         data[col] = data[col].apply(convert_to_time_format)
         data[col] = pd.to_timedelta(data[col])
-    data['time_difference'] = (data['end'] - data['start']).apply(lambda x: f"{int(x.total_seconds() // 60)}.{int(x.total_seconds() % 60):02}")
+    data['duration'] = (data['end'] - data['start']).apply(lambda x: f"{int(x.total_seconds() // 60)}.{int(x.total_seconds() % 60):02}")
+    data['duration'] = data['duration'].astype(float)
     data = data.drop(columns=['start', 'end'])  
     
     return data
@@ -403,7 +407,7 @@ def boxplot(data, title):
                  ax=axes[1,2])
 
     plt.tight_layout() 
-    plt.savefig(f'./EDA/{title}.png')
+    plt.savefig(f'./EDA/{title}_sensor.png')
     plt.show()
 
 # main function   
@@ -422,23 +426,29 @@ def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=Fals
         groundtruth = read_quest_csv(dataFolder, subject)
         # break
         
-        # if questionnaires self-reports needed
-        if not questionnaires:     
-            groundtruth = groundtruth[['label', 'time_difference']]
-            
-        per_subject = synch_data.join(groundtruth, lsuffix='_pkl', rsuffix='_quest')
-        per_subject = per_subject.drop(columns=['label_quest']).\
-                rename(columns={"label_pkl": "label"}).\
-                set_index('id')
+        # if questionnaires self-reports not needed
+        if not questionnaires:  
+            groundtruth = groundtruth[['label', 'duration']]
+        
+        synch_data['label'] = synch_data['label'].astype(int)
+        groundtruth['label'] = groundtruth['label'].astype(int)
+        per_subject = synch_data.join(groundtruth.set_index([ 'label' ]), 
+                                      on=['label'], lsuffix='_pkl', rsuffix='_quest')
+        per_subject = per_subject.set_index('id')
                        
         if not all_subjects.empty:
             all_subjects = pd.concat([all_subjects, per_subject])
         else:
             all_subjects = per_subject
     
-    
-    # boxplot(all_subjects, "after_FFT_cleaning")
+    all_subjects['label'] = all_subjects['label'].astype(str)
 
+    # EDA
+    # boxplot(all_subjects, "after_FFT_cleaning")
+    # all_subjects.boxplot(column='duration')
+    # plt.tight_layout() 
+    # plt.savefig(f'./EDA/before_duration.png')
+    # plt.show()
     
     # ----------
     # z-score normalization assumes a normal distribution but range varies
@@ -446,6 +456,7 @@ def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=Fals
     # -----------
     all_subjects = normalize(all_subjects, type)
 
+    # EDA
     # boxplot(all_subjects, 'normalised_sensor_data')
     # sns.countplot(data=all_subjects, x="label")
     # plt.xticks([0, 1, 2, 3], ['Baseline', 'Stress', 'Amusement', 'Meditation'])
@@ -453,6 +464,14 @@ def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=Fals
     # plt.savefig('./EDA/labels_distribution.png')
     # plt.show()
     
+    # correlation matrix to check the relationships of features
+    # correlation_matrix = all_subjects.corr()
+    # plt.figure(figsize=(10, 8))
+    # sns.heatmap(correlation_matrix, annot=False, cmap='coolwarm', center=0)
+    # plt.title("Correlation Matrix (Normalized)")
+    # plt.savefig("./EDA/corr.png")
+    # plt.show()
+
     label = all_subjects.pop('label')
     all_subjects['label'] = label.values.tolist()
     return all_subjects
