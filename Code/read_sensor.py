@@ -464,11 +464,12 @@ def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=Fals
     # plt.savefig('./EDA/labels_distribution.png')
     # plt.show()
     
-    # correlation matrix to check the relationships of features
+    ## correlation matrix to check the relationships of features
     # correlation_matrix = all_subjects.corr()
     # plt.figure(figsize=(10, 8))
     # sns.heatmap(correlation_matrix, annot=False, cmap='coolwarm', center=0)
     # plt.title("Correlation Matrix (Normalized)")
+    # plt.tight_layout()
     # plt.savefig("./EDA/corr.png")
     # plt.show()
 
