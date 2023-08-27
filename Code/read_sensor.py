@@ -86,7 +86,6 @@ def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=Fals
     all_subjects['label'] = label.values.tolist()
     return all_subjects
  
-
 # read data
 def read_pkl(dataFolder, subject, type='both'):
     # pkl file is already synchronized

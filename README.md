@@ -3,7 +3,9 @@
 ## [WESAD] dataset processing
 ## ➡️ *Overview of [Approach]* <- check me out
 
-*final output is not included in this repo as it exceeds the upload limit.*
+*final output is not included in this repo as it exceeds the upload limit.\
+./Code <- Python code\
+./EDA <- Figures*
 
 ### ⭐️ Main task: 
 * To prepare the WESAD data for predictive mood model.
