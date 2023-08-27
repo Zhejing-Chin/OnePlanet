@@ -145,6 +145,7 @@ python ./Code/main.py --path ./WESAD --type both --output_path ./output/full_dat
 > Helpful for engineers to work with domain expert to figure out best cleaning methods
 4. Feature Engineering
 > Extracting additional features from original dataset\
+> Feature selection\
 > Should work with domain experts else only adding unnecessary complexity
 5. Model building
 6. Model evaluation
