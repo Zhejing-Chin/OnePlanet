@@ -19,6 +19,74 @@ import warnings
 from pandas.errors import SettingWithCopyWarning
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
+# main function   
+def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=False):
+    all_subjects = pd.DataFrame()
+    
+    # error handling
+    if type not in ['both', 'chest', 'wrist']: 
+        return Exception("Sorry, only term in ['both', 'chest', 'wrist']")
+    
+    for subject in subjects:
+        synch_data = read_pkl(dataFolder, subject, type)
+        # encode ground truth - study protocol as class label
+        # keep only 1-4
+        synch_data = synch_data[synch_data['label'].isin([1, 2, 3, 4])]
+        groundtruth = read_quest_csv(dataFolder, subject)
+        # break
+        
+        # if questionnaires self-reports not needed
+        if not questionnaires:  
+            groundtruth = groundtruth[['label', 'duration']]
+        
+        synch_data['label'] = synch_data['label'].astype(int)
+        groundtruth['label'] = groundtruth['label'].astype(int)
+        per_subject = synch_data.join(groundtruth.set_index([ 'label' ]), 
+                                      on=['label'], lsuffix='_pkl', rsuffix='_quest')
+        per_subject = per_subject.set_index('id')
+                       
+        if not all_subjects.empty:
+            all_subjects = pd.concat([all_subjects, per_subject])
+        else:
+            all_subjects = per_subject
+    
+    all_subjects['label'] = all_subjects['label'].astype(str)
+
+    # EDA
+    # boxplot(all_subjects, "after_FFT_cleaning")
+    # all_subjects.boxplot(column='duration')
+    # plt.tight_layout() 
+    # plt.savefig(f'./EDA/before_duration.png')
+    # plt.show()
+    
+    # ----------
+    # z-score normalization assumes a normal distribution but range varies
+    # minmax sensitive to outliers, but gives specific range (0-1)
+    # -----------
+    all_subjects = normalize(all_subjects, type)
+
+    # EDA
+    # boxplot(all_subjects, 'normalised_sensor_data')
+    # sns.countplot(data=all_subjects, x="label")
+    # plt.xticks([0, 1, 2, 3], ['Baseline', 'Stress', 'Amusement', 'Meditation'])
+    # plt.title('Mood label distribution')
+    # plt.savefig('./EDA/labels_distribution.png')
+    # plt.show()
+    
+    ## correlation matrix to check the relationships of features
+    # correlation_matrix = all_subjects.corr()
+    # plt.figure(figsize=(10, 8))
+    # sns.heatmap(correlation_matrix, annot=False, cmap='coolwarm', center=0)
+    # plt.title("Correlation Matrix (Normalized)")
+    # plt.tight_layout()
+    # plt.savefig("./EDA/corr.png")
+    # plt.show()
+
+    label = all_subjects.pop('label')
+    all_subjects['label'] = label.values.tolist()
+    return all_subjects
+ 
+
 # read data
 def read_pkl(dataFolder, subject, type='both'):
     # pkl file is already synchronized
@@ -410,73 +478,6 @@ def boxplot(data, title):
     plt.savefig(f'./EDA/{title}_sensor.png')
     plt.show()
 
-# main function   
-def full_data_groundtruth(dataFolder, subjects, type='both', questionnaires=False):
-    all_subjects = pd.DataFrame()
-    
-    # error handling
-    if type not in ['both', 'chest', 'wrist']: 
-        return Exception("Sorry, only term in ['both', 'chest', 'wrist']")
-    
-    for subject in subjects:
-        synch_data = read_pkl(dataFolder, subject, type)
-        # encode ground truth - study protocol as class label
-        # keep only 1-4
-        synch_data = synch_data[synch_data['label'].isin([1, 2, 3, 4])]
-        groundtruth = read_quest_csv(dataFolder, subject)
-        # break
-        
-        # if questionnaires self-reports not needed
-        if not questionnaires:  
-            groundtruth = groundtruth[['label', 'duration']]
-        
-        synch_data['label'] = synch_data['label'].astype(int)
-        groundtruth['label'] = groundtruth['label'].astype(int)
-        per_subject = synch_data.join(groundtruth.set_index([ 'label' ]), 
-                                      on=['label'], lsuffix='_pkl', rsuffix='_quest')
-        per_subject = per_subject.set_index('id')
-                       
-        if not all_subjects.empty:
-            all_subjects = pd.concat([all_subjects, per_subject])
-        else:
-            all_subjects = per_subject
-    
-    all_subjects['label'] = all_subjects['label'].astype(str)
-
-    # EDA
-    # boxplot(all_subjects, "after_FFT_cleaning")
-    # all_subjects.boxplot(column='duration')
-    # plt.tight_layout() 
-    # plt.savefig(f'./EDA/before_duration.png')
-    # plt.show()
-    
-    # ----------
-    # z-score normalization assumes a normal distribution but range varies
-    # minmax sensitive to outliers, but gives specific range (0-1)
-    # -----------
-    all_subjects = normalize(all_subjects, type)
-
-    # EDA
-    # boxplot(all_subjects, 'normalised_sensor_data')
-    # sns.countplot(data=all_subjects, x="label")
-    # plt.xticks([0, 1, 2, 3], ['Baseline', 'Stress', 'Amusement', 'Meditation'])
-    # plt.title('Mood label distribution')
-    # plt.savefig('./EDA/labels_distribution.png')
-    # plt.show()
-    
-    ## correlation matrix to check the relationships of features
-    # correlation_matrix = all_subjects.corr()
-    # plt.figure(figsize=(10, 8))
-    # sns.heatmap(correlation_matrix, annot=False, cmap='coolwarm', center=0)
-    # plt.title("Correlation Matrix (Normalized)")
-    # plt.tight_layout()
-    # plt.savefig("./EDA/corr.png")
-    # plt.show()
-
-    label = all_subjects.pop('label')
-    all_subjects['label'] = label.values.tolist()
-    return all_subjects
- 
 # --------------------
 # not necessary to read respiban and empatica, as they must be synchronized with labels
 # pkl is already providing synchronized data. 

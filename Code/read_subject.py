@@ -9,7 +9,42 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import string
 
+# main function
+def get_personal_information(dataFolder, subjects):
+    personal_information = pd.DataFrame({'id':'', 
+                                    'age':int(), 
+                                    'height_cm':float(), 
+                                    'weight_kg':float(), 
+                                    'gender':'', 
+                                    'dominant_hand':'',
+                                    'coffee_today':'', 
+                                    'coffee_last_hr':'', 
+                                    'sports_today':'', 
+                                    'smoker':'',
+                                    'smoke_last_hr':'', 
+                                    'ill_today':'', 
+                                    'additional_notes':''}, index=[])
+    
+    for subject in subjects:
+        row = pd.DataFrame([read_readme_txt(dataFolder, subject)])
+        
+        personal_information = pd.concat([personal_information, row], ignore_index = True)
+        
+        # Reduce dimension
+        # the columns have no variations in value hence provide no information to model
+        personal_information = personal_information.drop(columns=['coffee_last_hr', 'smoke_last_hr'])
+        
+    # cleaning
+    personal_information = normalize(personal_information)  
+            
+    # feature engineering
+    encoded_personal_information = encode_embed(personal_information)
+    
+    personal_information = encoded_personal_information.set_index('id') 
 
+    return personal_information
+
+# read data
 def read_readme_txt(dataFolder, subject):
     path = f"{dataFolder}/{subject}/{subject}_readme.txt"
     with open(path) as f:        
@@ -59,40 +94,6 @@ def read_readme_txt(dataFolder, subject):
         
     return row
     
-def get_personal_information(dataFolder, subjects):
-    personal_information = pd.DataFrame({'id':'', 
-                                    'age':int(), 
-                                    'height_cm':float(), 
-                                    'weight_kg':float(), 
-                                    'gender':'', 
-                                    'dominant_hand':'',
-                                    'coffee_today':'', 
-                                    'coffee_last_hr':'', 
-                                    'sports_today':'', 
-                                    'smoker':'',
-                                    'smoke_last_hr':'', 
-                                    'ill_today':'', 
-                                    'additional_notes':''}, index=[])
-    
-    for subject in subjects:
-        row = pd.DataFrame([read_readme_txt(dataFolder, subject)])
-        
-        personal_information = pd.concat([personal_information, row], ignore_index = True)
-        
-        # Reduce dimension
-        # the columns have no variations in value hence provide no information to model
-        personal_information = personal_information.drop(columns=['coffee_last_hr', 'smoke_last_hr'])
-        
-    # cleaning
-    personal_information = normalize(personal_information)  
-            
-    # feature engineering
-    encoded_personal_information = encode_embed(personal_information)
-    
-    personal_information = encoded_personal_information.set_index('id') 
-
-    return personal_information
-
 # encode and embed data
 def encode_embed(data):
     # clean and embed additional notes
