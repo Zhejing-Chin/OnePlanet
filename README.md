@@ -23,10 +23,10 @@
 
 ### End Output includes:
 1. Personal information: [id, age, ..., additional notes]
-2. Sensor signals:\
+2. Sensor signals (either one):\
     i. chest and wrist (32hz)\
     ii. chest only (700hz)\
-    iii. wrist only (64hz)\
+    iii. wrist only (64hz)
 3. Time duration
 4. Questionnaires (optional)
 5. Label
